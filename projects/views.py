@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from .models import Project, Review, Tag
 from .forms import ProjectForm
 
@@ -15,6 +16,7 @@ def project(request, pk):
     context = {'project': projectObj}
     return render(request, 'projects/single-projects.html', context)
 
+@login_required(login_url="login")
 def createProject(request):
     form = ProjectForm(request.POST, request.FILES)
     
@@ -28,6 +30,7 @@ def createProject(request):
     context = {'form': form}
     return render(request, "projects/project_form.html", context)
 
+@login_required(login_url="login")
 def updateProject(request, pk):
     project = Project.objects.get(id=pk)
     form = ProjectForm(instance=project)
@@ -42,6 +45,7 @@ def updateProject(request, pk):
     context = {'form': form}
     return render(request, "projects/project_form.html", context)
 
+@login_required(login_url="login")
 def deleteProject(request, pk):
     # we are using objects so that we are able to delete anything, parent, and children of Project?
     project = Project.objects.get(id=pk)
