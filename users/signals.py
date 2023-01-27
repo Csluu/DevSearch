@@ -5,6 +5,7 @@ from .models import Profile
 from django.dispatch import receiver
 
 # signals does stuff before or after something happens usually pre save, post save, pre delete and post delete
+# using signals to modify User stuff when Profile gets update - so what we're not messing with user stuff directly 
 # NEED TO ADD TO THE LOCAL APPS.PY FILE!!!!! IN ORDER TO WORK 
 
 
@@ -12,14 +13,24 @@ from django.dispatch import receiver
 # kwargs stands for key word arguments 
 # @receiver(post_save, sender=Profile)
 def createProfile(sender, instance, created, **kwargs):
-    print("its working")
     if created:
         user = instance
         profile = Profile.objects.create(
             user=user,
             username=user.username,
             email=user.email,
-            name=user.first_name)
+            name=user.first_name,
+        )
+        
+def updateProfile(sender, instance, created, **kwargs):
+    profile = instance
+    user = profile.user
+    # making sure this doesn't loop back and forth between createProfile and updateProfile forever
+    if created == False:
+        user.first_name = profile.name
+        user.username = profile.username
+        user.email = profile.email
+        user.save()
 
 # its deleting the user if the user profile is deleted as it automatically deletes the other way around
 def deleteUser(sender, instance, **kwargs):
@@ -28,4 +39,5 @@ def deleteUser(sender, instance, **kwargs):
     
 # what the decorators are doing
 post_save.connect(createProfile, sender=User)
+post_save.connect(updateProfile, sender=Profile)
 post_delete.connect(deleteUser, sender=Profile)

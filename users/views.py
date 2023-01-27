@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Profile, Skill
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, ProfileForm, SkillForm
 
 # Create your views here.
 
@@ -28,11 +28,11 @@ def loginUser(request):
     page = 'login'
     
     if request.user.is_authenticated:
-        return redirect('profiles')
+        return redirect('profiles') 
     
     
     if request.method == 'POST':
-        username = request.POST['username']
+        username = request.POST['username'].lower()
         password = request.POST['password']
         
         # I feel like this section could definitely be written better [------------
@@ -76,10 +76,47 @@ def registerUser(request):
             messages.success(request, 'User account was created!')
             
             login(request, user)
-            return redirect('profiles')
+            return redirect('edit-account')
         else:
             messages.success(request, 'Error has occurred during registration!')
     
     
     context = {'page': page, 'form': form}
     return render(request, 'users/login_register.html', context)
+
+@login_required(login_url='login')
+def userAccount(request):
+    # request.user is the current user
+    profile = request.user.profile
+    
+    skills = profile.skill_set.all()
+    
+    context = {'profile': profile, 'skills': skills}
+    
+    return render(request, 'users/account.html', context)
+
+@login_required(login_url='login')
+def editAccount(request):
+    profile = request.user.profile
+    # need to do instance=profile to preload the information
+    form = ProfileForm(instance=profile)
+    
+    if request.method == 'POST':
+        # request.POST is normally text data, request.FILE is the picture
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+            
+            return redirect('account')
+    
+    
+    context = {'form': form}
+    return render(request, 'users/profile_form.html', context)
+
+@login_required(login_url='login')
+def createSkill(request):
+    form = SkillForm()
+    context = {'form': form}
+    return render(request, 'users/skill_form.html', context)

@@ -18,12 +18,15 @@ def project(request, pk):
 
 @login_required(login_url="login")
 def createProject(request):
+    profile = request.user.profile
     form = ProjectForm(request.POST, request.FILES)
     
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid():
-            form.save()
+            project = form.save(commit=False)
+            project.owner = profile
+            project.save()
             # send user back to projects page. Remember we get 'projects' from urls.py
             return redirect('projects')
     
@@ -32,7 +35,9 @@ def createProject(request):
 
 @login_required(login_url="login")
 def updateProject(request, pk):
-    project = Project.objects.get(id=pk)
+    # making sure only the user who created the project can edit 
+    profile = request.user.profile
+    project = profile.project_set.get(id=pk)
     form = ProjectForm(instance=project)
     
     if request.method == 'POST':
@@ -48,7 +53,12 @@ def updateProject(request, pk):
 @login_required(login_url="login")
 def deleteProject(request, pk):
     # we are using objects so that we are able to delete anything, parent, and children of Project?
-    project = Project.objects.get(id=pk)
+    # project = Project.objects.get(id=pk)
+    
+    #     # making sure only the user who created the project can delete
+    profile = request.user.profile
+    project = profile.project_set.get(id=pk)
+    
     
     if request.method == 'POST':
         project.delete()

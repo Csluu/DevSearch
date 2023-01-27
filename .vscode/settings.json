@@ -1,0 +1,11 @@
+{
+  "[html]": {
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "html.format.templating": true,
+  "[django-html]": {
+    "editor.defaultFormatter": "monosans.djlint"
+  }
+}
