@@ -1,0 +1,38 @@
+{% comment %} if theres only one page we don't show pagination  {% endcomment %}
+{% comment %} using queryset variable so that it works on other apps, pages, etc just need to do something like {% include "pagination.html" with queryset=projects custom_range=custom_range %} {% endcomment %}
+{% if queryset.has_other_pages %}
+    <div class="pagination">
+        <ul class"container">
+            {% if queryset.has_previous %}
+                {% comment %} &#10094; gives us the back space button {% endcomment %}
+                {% comment %} we are using this long ass href so that both search and pagination work {% endcomment %}
+                <li>
+                    <a href="{% if search_query %}?search_query={{ search_query }}&{% else %}?{% endif %}page={{ queryset.previous_page_number }}"
+                       class="btn page-link">&#10094; Prev</a>
+                </li>
+            {% endif %}
+            {% for page in custom_range %}
+                {% comment %} This is the current page that we are on which is highlighted {% endcomment %}
+                {% if page == queryset.number %}
+                    <li>
+                        <a href="{% if search_query %}?search_query={{ search_query }}&{% else %}?{% endif %}page={{ page }}"
+                           class="btn page-link btn--sub">{{ page }}</a>
+                    </li>
+                    {% comment %} all the other pages {% endcomment %}
+                {% else %}
+                    <li>
+                        <a href="{% if search_query %}?search_query={{ search_query }}&{% else %}?{% endif %}page={{ page }}"
+                           class="btn page-link">{{ page }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if queryset.has_next %}
+                {% comment %} &#10094; gives us the back space button {% endcomment %}
+                <li>
+                    <a href="{% if search_query %}?search_query={{ search_query }}&{% else %}?{% endif %}page={{ queryset.next_page_number }}"
+                       class="btn page-link">Next &#10095</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
