@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from .models import Profile
 # decorators for the signals 
 from django.dispatch import receiver
+# email stuff
+from django.core.mail import send_mail
+from django.conf import settings
 
 # signals does stuff before or after something happens usually pre save, post save, pre delete and post delete
 # using signals to modify User stuff when Profile gets update - so what we're not messing with user stuff directly 
@@ -21,6 +24,22 @@ def createProfile(sender, instance, created, **kwargs):
             email=user.email,
             name=user.first_name,
         )
+        
+        # Email stuff if we want to add it
+        # subject = 'Welcome to DevSearch'
+        # message = 'We are glad you are here!'
+        
+        # # sending the email that the account was created
+        # send_mail(
+        #     subject,
+        #     message,
+        #     settings.EMAIL_HOST_USER,
+        #     # recipient 
+        #     [profile.email],
+        #     fail_silently=False,
+        # )
+        
+        
         
 def updateProfile(sender, instance, created, **kwargs):
     profile = instance

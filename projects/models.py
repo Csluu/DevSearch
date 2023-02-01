@@ -25,15 +25,35 @@ class Project(models.Model):
         return self.title
     
     class Meta:
-        # - gives us the newest first by default it will give us the oldest first 
-        ordering = ['-created']
+        # - orders it by descending by vote ratio first then how many votes it has if it has neither then it is by date created
+        ordering = ['-vote_ratio', '-vote_total', '-created']
+        
+    @property
+    def reviewers(self):
+        # gives us the list of reviewers
+        queryset = self.review_set.all().values_list('owner__id', flat=True)
+        return queryset
+        
+        
+    @property
+    def getVoteCount(self):
+        reviews = self.review_set.all()
+        upVotes = reviews.filter(value='up').count()
+        totalVotes = reviews.count()
+
+        ratio = (upVotes / totalVotes) * 100
+        self.vote_total = totalVotes
+        self.vote_ratio = ratio
+
+        self.save()
     
 class Review(models.Model):
     VOTE_TYPE = (
         ('up', 'Up Vote'),
         ('down', 'Down Vote')
     )
-    # owner = 
+    # keeping it null=True because we have fake profiles at the moment
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, )
     # on_delete will delete all the reviews(child) for a project(parent) if project is deleted
     # foreign key establishes a one to many relationship 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -41,6 +61,10 @@ class Review(models.Model):
     value = models.CharField(max_length=200, choices=VOTE_TYPE)
     created = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    class Meta:
+        # makes it so that only a person can only make one review for a project
+        unique_together =[['owner', 'project']]
     
     def __str__(self):
         return self.value

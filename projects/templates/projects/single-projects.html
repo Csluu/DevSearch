@@ -26,7 +26,8 @@
           <img class="singleProject__preview"
                src="{{ project.featured_image.url }}"
                alt="portfolio thumbnail"/>
-          <a href="profile.html" class="singleProject__developer">Md. Shahriar Parvez</a
+          <a href="{% url 'user-profile' project.owner.id %}"
+             class="singleProject__developer">{{ project.owner.name }}</a
             >
             <h2 class="singleProject__title">{{ project.title }}</h2>
             <h3 class="singleProject__subtitle">About the Project</h3>
@@ -37,55 +38,49 @@
                 {{ project.vote_ratio }}% Postitive Feedback ({{ project.vote_total }})
                 Vote{{ project.vote_total|pluralize:"s" }}
               </h5>
-              <form class="form" action="#" method="POST">
-                <!-- Textarea -->
-                <div class="form__field">
-                  <label for="formInput#textarea">Comments:</label>
-                  <textarea class="input input--textarea"
-                            name="message"
-                            id="formInput#textarea"
-                            placeholder="Write your comments here..."></textarea>
-                </div>
-                <input class="btn btn--sub btn--lg" type="submit" value="Comments" />
-              </form>
+              {% comment %} making sure if they already reviewed they can't post another review / give a message saying that have already done so{% endcomment %}
+              {% if request.user.profile.id in project.reviewers %}
+                <p>You have already submitted your review for this project</p>
+              {% elif request.user.profile == project.owner %}
+                <p>You cannot review your own work</p>
+              {% elif request.user.is_authenticated %}
+                <form class="form" action="{% url 'project' project.id %}" method="POST">
+                  {% csrf_token %}
+                  {% for field in form %}
+                    <div class="form__field">
+                      <label for="formInput#textarea">{{ field.label }}</label>
+                      {{ field }}
+                    </div>
+                  {% endfor %}
+                  <input class="btn btn--sub btn--lg" type="submit" value="Add Review" />
+                </form>
+              {% else %}
+              {% comment %} ?={{request.path}} is sent over to login_register so that it sends them back to the project page after they login {% endcomment %}
+                <a href="{% url 'login' %}?next={{ request.path }}">Please login to leave a review</a>
+              {% endif %}
               <div class="commentList">
-                <div class="comment">
-                  <a href="profile.html">
-                    <img class="avatar avatar--md"
-                         src="https://pbs.twimg.com/profile_images/1335382240931368961/b3wSZKj4_400x400.jpg"
-                         alt="user"/>
-                  </a>
-                  <div class="comment__details">
-                    <a href="profile.html" class="comment__author">Sulamita Ivanov</a
-                      >
-                      <p class="comment__info">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Reprehenderit alias numquam perferendis mollitia minus minima
-                        exercitationem possimus ab deserunt qui, soluta iusto
-                        doloribus eveniet similique consequuntur ratione, dignissimos
-                        ut magni laborum quo.
-                      </p>
+                {% for review in project.review_set.all %}
+                  {% comment %} making sure the review has a written portion before displaying {% endcomment %}
+                  {% if review.body %}
+                    <div class="comment">
+                      <a href="{% url 'user-profile' review.owner.id %}">
+                        <img class="avatar avatar--md"
+                             src="{{ review.owner.profile_image.url }}"
+                             alt="user"/>
+                      </a>
+                      <div class="comment__details">
+                        <a href="{% url 'user-profile' review.owner.id %}"
+                           class="comment__author">{{ review.owner.name }}</a>
+                        {% comment %} linebreaksbr will display a line break if there is a line break in the body {% endcomment %}
+                        <p class="comment__info">{{ review.body|linebreaksbr }}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div class="comment">
-                    <a href="profile.html">
-                      <img class="avatar avatar--md"
-                           src="https://avatars.githubusercontent.com/u/33843378"
-                           alt="user"/>
-                    </a>
-                    <div class="comment__details">
-                      <a href="profile.html" class="comment__author">Dennis Ivanov</a>
-                      <p class="comment__info">
-                        Consectetur adipisicing elit. Reprehenderit alias numquam
-                        perferendis mollitia minus minima exercitationem possimus ab
-                        deserunt qui, ratione, dignissimos ut magni laborum quo.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  {% endif %}
+                {% endfor %}
               </div>
             </div>
           </div>
         </div>
-      </main>
-    {% endblock content %}
+      </div>
+    </main>
+  {% endblock content %}
