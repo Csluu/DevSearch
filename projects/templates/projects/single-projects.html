@@ -14,17 +14,21 @@
             {% endfor %}
           </div>
           {% if project.source_link %}
-            <a class="singleProject__liveLink" href="#" target="_blank"><i class="im im-external-link"></i>Source Code
+            <a class="singleProject__liveLink"
+               href="{{ project.source_link }}"
+               target="_blank"><i class="im im-external-link"></i>Source Code
             </a>
           {% endif %}
           {% if project.demo_link %}
-            <a class="singleProject__liveLink" href="#" target="_blank"><i class="im im-external-link"></i>Live Demo
+            <a class="singleProject__liveLink"
+               href="{{ project.demo_link }}"
+               target="_blank"><i class="im im-external-link"></i>Live Demo
             </a>
           {% endif %}
         </div>
         <div class="column column--2of3">
           <img class="singleProject__preview"
-               src="{{ project.featured_image.url }}"
+               src="{{ project.imageURL }}"
                alt="portfolio thumbnail"/>
           <a href="{% url 'user-profile' project.owner.id %}"
              class="singleProject__developer">{{ project.owner.name }}</a
@@ -55,7 +59,7 @@
                   <input class="btn btn--sub btn--lg" type="submit" value="Add Review" />
                 </form>
               {% else %}
-              {% comment %} ?={{request.path}} is sent over to login_register so that it sends them back to the project page after they login {% endcomment %}
+                {% comment %} ?={{request.path}} is sent over to login_register so that it sends them back to the project page after they login {% endcomment %}
                 <a href="{% url 'login' %}?next={{ request.path }}">Please login to leave a review</a>
               {% endif %}
               <div class="commentList">

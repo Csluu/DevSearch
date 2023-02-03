@@ -5,7 +5,7 @@ from users.models import Profile
 # Create your models here.
 class Project(models.Model):
     # many to one relationship 
-    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     featured_image = models.ImageField(null=True, blank=True, default="default.jpg")
@@ -27,6 +27,15 @@ class Project(models.Model):
     class Meta:
         # - orders it by descending by vote ratio first then how many votes it has if it has neither then it is by date created
         ordering = ['-vote_ratio', '-vote_total', '-created']
+        
+    @property
+    def imageURL(self):
+        try:
+            url = self.featured_image.url
+        except:
+            url = ''
+        return url
+            
         
     @property
     def reviewers(self):

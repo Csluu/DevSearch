@@ -8,7 +8,12 @@
         <h2 class="message__subject">
           {{ message.subject }}
         </h4>
-        <a href="profile.html" class="message__author">{{ message.name }}</a>
+        {% if message.sender %}
+          <a href="{% url 'user-profile' message.sender.id %}"
+             class="message__author">{{ message.name }}</a>
+        {% else %}
+          <p class="message__author">{{ message.name }}</p>
+        {% endif %}
         <p class="message__date">{{ message.created }}</p>
         {% comment %} remember linebreaksbr adds link breaks if the message body has any {% endcomment %}
         <div class="message__body">{{ message.body|linebreaksbr }}</div>

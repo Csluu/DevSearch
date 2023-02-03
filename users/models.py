@@ -26,6 +26,18 @@ class Profile(models.Model):
     def __str__(self):
         return str(self.username)
     
+    class Meta:
+        ordering = ['-created']
+    
+    # doing this just in case user deletes the image for their profile
+    @property
+    def imageURL(self):
+        try:
+            url = self.profile_image.url
+        except:
+            url = ''
+        return url
+    
 class Skill(models.Model):
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=200, blank=True, null=True)

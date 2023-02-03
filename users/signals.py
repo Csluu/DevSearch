@@ -52,9 +52,13 @@ def updateProfile(sender, instance, created, **kwargs):
         user.save()
 
 # its deleting the user if the user profile is deleted as it automatically deletes the other way around
+# we are using the try method because if we delete the user the project gets automatically deleted however it sees that and wants to try to delete the user 
 def deleteUser(sender, instance, **kwargs):
-    user = instance.user
-    user.delete()
+    try:
+        user = instance.user
+        user.delete()
+    except:
+        pass
     
 # what the decorators are doing
 post_save.connect(createProfile, sender=User)
