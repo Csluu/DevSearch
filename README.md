@@ -16,7 +16,7 @@ DevSearch is a social media platform specifically designed for software develope
     - pip install virtualenv
     - virtualenv envname
     - envname\scripts\activate
-- 3 - cd into project "cd django-2021"
+- 3 - cd into project "cd DevSearch"
 - 4 - pip install -r requirements.txt
 - 5 - python manage.py runserver
 
@@ -24,15 +24,19 @@ DevSearch is a social media platform specifically designed for software develope
 **Login / Create Account**
 - Enter your login credentials if you already have an account
 ![login](./README_Images/login.png)
+
 **Profiles**
 - Edit your profile and create projects in the Account Tab
 ![profile](./README_Images/profile.png)
+
 **Developers**
 - Search other users in the Developers Tab
 ![home](./README_Images/home.png)
+
 **Projects**
 - Search for other user generated projects in the Projects Tab
 ![projects](./README_Images/projects.png)
+
 **Inbox**
 - Check received messages in the Inbox Tab
 ![message](./README_Images/message.png)
